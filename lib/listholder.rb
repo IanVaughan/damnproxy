@@ -2,16 +2,15 @@ require 'yaml'
 
 class ListHolder
 
-  attr_reader :list
+  attr_reader :yml
 
   def initialize(file)
-    @list = []
-    #@yml = YAML.load(file)
+    @yml = []
+    @yml = YAML.load_file(file) if File.exist?(file)
   end
 
   def add url
-    @list << url
-    #@yml[:site] = url
+    @yml << { :site => "#{url}" }
   end
 
   def edit url, to
@@ -20,7 +19,7 @@ class ListHolder
   end
 
   def delete url
-    @list.delete(url)
+    @yml.delete_if { |pack| pack == { site: "#{url}" } }
   end
 
 end
