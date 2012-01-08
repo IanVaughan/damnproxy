@@ -1,13 +1,17 @@
+require 'yaml'
+
 class ListHolder
 
   attr_reader :list
 
-  def initialize
+  def initialize(file)
     @list = []
+    #@yml = YAML.load(file)
   end
 
   def add url
     @list << url
+    #@yml[:site] = url
   end
 
   def edit url, to

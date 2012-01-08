@@ -1,7 +1,8 @@
 source :rubygems
 
 gem 'sinatra'
-# gem 'haml'
+gem 'haml'
+gem 'fakefs'
 
 group :development, :test do
   gem 'rspec'

@@ -1,14 +1,15 @@
-#ProxyChecker
-#get valid response for site thats ok
-#get blocked from a site that is blocked
+require 'proxychecker'
 
-#App
-#iterate through list of urls checking each one
+describe ProxyChecker do
 
-#require "#{File.dirname(__FILE__)}/../lib/checkout"
-#require 'yaml'
+  it "gets valid response for site that's allowed" do
+    Net::HTTP.stub!(:get).and_return('')
+    ProxyChecker.blocked?('www.google.com').should eq true
+  end
 
-#site = {
-  #:url => 'www.google.com',
-  #:lastchecked => 3
-#}
+  it "gets blocked from a site that is blocked" do
+    Net::HTTP.stub!(:get).and_return('blocked')
+    ProxyChecker.blocked?('www.google.com').should eq false
+  end
+
+end
