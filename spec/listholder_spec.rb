@@ -3,17 +3,32 @@ require 'fakefs/safe'
 
 describe ListHolder do
   before(:each) do
+    FakeFS.activate!
     #@lh = ListHolder.new(File.open('config.yml'))
     @lh = ListHolder.new('config.yml')
   end
 
   context "with no data file" do
-    it "saves a new url to list and file" do
-      site = 'www.google.com'
+    it "saves a new url to list" do
+      site = 'www.bar.com'
       expected_data = [{ :site => "#{site}" }]
       @lh.add site
       @lh.yml.should eq expected_data
     end
+
+    it "saves data to file" do
+      new_url = 'www.foo.com'
+      expected_data = [{ :site => "#{new_url}" }]
+      @lh.add(new_url)
+      saved_yaml = YAML.load_file('config.yml')
+      saved_yaml.should eq expected_data
+    end
+
+    after(:each) do
+      @lh.clear
+      FakeFS.deactivate!
+    end
+
   end
 
   context "with an existing data file" do
@@ -36,6 +51,7 @@ describe ListHolder do
     end
 
     after(:each) do
+      @lh.clear
       FakeFS.deactivate!
     end
 
@@ -43,19 +59,14 @@ describe ListHolder do
       @lh.yml.should eq @expected_data
     end
 
-    it "save new url to list and file" do
-      data = [{ :site => 'www.google.com' }]
-      site = 'www.google.com'
-      expected_data = [{ :site => "#{site}" }]
-
-      @lh.yml.should eq expected_data
-      @lh.yml.should eq data
+    it "clears urls from list" do
+      @lh.clear
+      @lh.yml.should eq []
     end
 
-    it "save another new url to list and file" do
+    it "saves a new url to list and file" do
       new_url = 'www.foo.com'
-      new_expected_data = { :site => "#{new_url}" }
-      @expected_data << new_expected_data
+      @expected_data << { :site => "#{new_url}" }
 
       @lh.add new_url
       @lh.yml.should eq @expected_data
@@ -66,10 +77,19 @@ describe ListHolder do
       @lh.yml.should eq []
     end
 
+    it "adds and deletes a url from list/file" do
+      new_url = 'www.foo.com'
+      expected_data = [{ :site => "#{new_url}" }]
+      @lh.add new_url
+      @lh.delete('www.google.com')
+      @lh.yml.should eq expected_data
+    end
+
     it "edits url from list/file" do
       @lh.edit('www.google.com', 'www.google.co.uk')
       data = [{ :site => 'www.google.co.uk' }]
       @lh.yml.should eq data
     end
+
   end
 end
