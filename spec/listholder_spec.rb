@@ -28,7 +28,6 @@ describe ListHolder do
       @lh.clear
       FakeFS.deactivate!
     end
-
   end
 
   context "with an existing data file" do
@@ -91,5 +90,51 @@ describe ListHolder do
       @lh.yml.should eq data
     end
 
+    it "allows or does not allow duplicates?" do
+      @lh.add('www.google.com')
+      @lh.yml.should eq @expected_data << { :site => 'www.google.com' }
+    end
+
   end
+
+  context "using iterators and other cool shit" do
+    before(:each) do
+      FakeFS.activate!
+      @lh = ListHolder.new('config.yml')
+    end
+
+    it "adds many urls" do
+      url1 = { :site => 'www.google.co.uk' }
+      url2 = { :site => 'www.coo.co.uk' }
+      @lh.add url1[:site], url2[:site]
+      @lh.yml.should eq [url1, url2]
+    end
+
+    it "adds a list of urls" do
+      pending
+      url1 = { :site => 'www.google.co.uk' }
+      url2 = { :site => 'www.coo.co.uk' }
+      @lh.add [url1[:site], url2[:site]]
+      @lh.yml.should eq [url1, url2]
+    end
+
+    it "adds a list of urls via a block" do
+      pending
+      url1 = { :site => 'www.bar' }
+      #@lh.add do { | site | url }
+      @lh.yml.should eq [url1, url1]
+    end
+
+    it "yields each url in a list of urls" do
+      @lh.add 'www.google.co.uk', 'www.foo.co.uk'
+      #@lh.each_url.should
+    end
+
+    after(:each) do
+      @lh.clear
+      FakeFS.deactivate!
+    end
+
+  end
+
 end

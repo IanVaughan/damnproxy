@@ -10,8 +10,14 @@ class ListHolder
     @yml = YAML.load_file(file) if File.exist?(file)
   end
 
-  def add url
-    @yml << { :site => "#{url}" }
+  def add (*url)
+
+    url.each do |e|
+      @yml << { :site => "#{e}" } if e.class == String
+    end if url.class == Array
+    @yml.flatten!
+
+    #@yml << { :site => "#{url}" } if url.class == String
     save
   end
 
@@ -32,6 +38,10 @@ class ListHolder
 
   def save
     File.open(@file, 'w' ) { |f| YAML.dump(@yml, f) }
+  end
+
+  def each_url &block
+    @yml
   end
 
 end
